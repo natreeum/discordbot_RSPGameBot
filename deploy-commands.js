@@ -11,8 +11,8 @@ const commands = [
     .setDescription("Rock Scissors Paper Game start")
     .addIntegerOption((option) =>
       option
-        .setName("input")
-        .setDescription("The input to echo back")
+        .setName("choice")
+        .setDescription("Rock? Scissors? Paper?")
         .setRequired(true)
         .addChoices(
           { name: "Rock", value: 1 },

@@ -15,53 +15,37 @@ client.on("interactionCreate", async (interaction) => {
 
   const { commandName } = interaction;
 
-  if (commandName === "game") {
-    await interaction.reply("Pong!");
-  } else if (commandName === "rspgame") {
-    const input = interaction.options.getInteger("input");
-    const num = Math.floor(Math.random() * 3 + 1);
-    let state = 0;
+  if (commandName === "rspgame") {
+    const myChoice = interaction.options.getInteger("choice");
+    const enemyChoice = Math.floor(Math.random() * 3 + 1);
+    let winner = "";
+    let areYouWin = "";
+    const chat = {
+      1: ":fist:",
+      2: ":v:",
+      3: ":hand_splayed:",
+    };
+    //1 : rock, 2: scissors, 3: paper
+    const weapons = {
+      1: { weakTo: "3", strongTo: "2" },
+      2: { weakTo: "1", strongTo: "3" },
+      3: { weakTo: "2", strongTo: "1" },
+    };
 
-    const list = new Map();
-    list.set(1, ":fist:");
-    list.set(2, ":v:");
-    list.set(3, ":hand_splayed:");
+    if (weapons[myChoice].weakTo == enemyChoice) winner = "bot";
+    else if (weapons[myChoice].strongTo == enemyChoice) winner = "you";
+    else winner = "draw";
 
-    const _state = new Map();
-    _state.set(1, ":o: Win");
-    _state.set(2, ":x: Lose");
-    _state.set(3, ":grey_question: Draw");
-
-    if (input == 1) {
-      if (num == 1) {
-        state = 3;
-      } else if (num == 3) {
-        state = 2;
-      } else if (num == 2) {
-        state = 1;
-      }
-    } else if (input == 2) {
-      if (num == 1) {
-        state = 2;
-      } else if (num == 2) {
-        state = 3;
-      } else if (num == 3) {
-        state = 1;
-      }
-    } else if (input == 3) {
-      if (num == 1) {
-        state = 1;
-      } else if (num == 2) {
-        state = 2;
-      } else if (num == 3) {
-        state = 3;
-      }
+    if (winner == "you") {
+      areYouWin = "Win :o:";
+    } else if (winner == "bot") {
+      areYouWin = "Lose :x:";
+    } else if (winner == "draw") {
+      areYouWin = "Draw :grey_question:";
     }
-    console.log(num);
+
     await interaction.reply(
-      `:robot: : [${list.get(num)}], You : [${list.get(
-        input
-      )}] \nYou ${_state.get(state)}!`
+      `:robot: : [${chat[enemyChoice]}], You : [${chat[myChoice]}] \nYou ${areYouWin}`
     );
   }
 });
