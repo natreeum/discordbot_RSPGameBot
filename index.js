@@ -1,54 +1,40 @@
-// Require the necessary discord.js classes
-const { Client, GatewayIntentBits } = require("discord.js");
-const { token } = require("./config.json");
-//const config = require("./config.js");
-// Create a new client instance
+const fs = require('node:fs');
+const path = require('node:path');
+
+const { Client, Collection, GatewayIntentBits } = require('discord.js');
+const { token } = require('./config.json');
+
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-// When the client is ready, run this code (only once)
-client.once("ready", () => {
-  console.log("Ready!");
+client.commands = new Collection();
+const commandsPath = path.join(__dirname, 'commands');
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+	const filePath = path.join(commandsPath, file);
+	const command = require(filePath);
+	// Set a new item in the Collection
+	// With the key as the command name and the value as the exported module
+	client.commands.set(command.data.name, command);
+}
+
+client.once('ready', () => {
+	console.log('Ready!');
 });
 
-client.on("interactionCreate", async (interaction) => {
-  if (!interaction.isChatInputCommand()) return;
+client.on('interactionCreate', async interaction => {
+	if (!interaction.isChatInputCommand()) return;
 
-  const { commandName } = interaction;
+	const command = client.commands.get(interaction.commandName);
 
-  if (commandName === "rspgame") {
-    const myChoice = interaction.options.getInteger("choice");
-    const enemyChoice = Math.floor(Math.random() * 3 + 1);
-    let winner = "";
-    let areYouWin = "";
-    const chat = {
-      1: ":fist:",
-      2: ":v:",
-      3: ":hand_splayed:",
-    };
-    //1 : rock, 2: scissors, 3: paper
-    const weapons = {
-      1: { weakTo: "3", strongTo: "2" },
-      2: { weakTo: "1", strongTo: "3" },
-      3: { weakTo: "2", strongTo: "1" },
-    };
+	if (!command) return;
 
-    if (weapons[myChoice].weakTo == enemyChoice) winner = "bot";
-    else if (weapons[myChoice].strongTo == enemyChoice) winner = "you";
-    else winner = "draw";
-
-    if (winner == "you") {
-      areYouWin = "Win :o:";
-    } else if (winner == "bot") {
-      areYouWin = "Lose :x:";
-    } else if (winner == "draw") {
-      areYouWin = "Draw :grey_question:";
-    }
-
-    await interaction.reply(
-      `:robot: : [${chat[enemyChoice]}], You : [${chat[myChoice]}] \nYou ${areYouWin}`
-    );
-  }
+	try {
+		await command.execute(interaction);
+	} catch (error) {
+		console.error(error);
+		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+	}
 });
 
-// Login to Discord with your client's token
 client.login(token);
