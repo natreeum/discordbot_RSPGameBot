@@ -6,11 +6,6 @@ const gamedata = {
 };
 
 module.exports = {
-  // isStarted: false,
-  // gamedata: {
-  //   firstChoice: [{ user: "" }, { choice: 0 }],
-  //   secondChoice: [{ user: "" }, { choice: 0 }],
-  // },
   data: new SlashCommandBuilder()
     .setName("rsppvp")
     .setDescription("Rock Scissors Paper Game start")
@@ -44,7 +39,9 @@ module.exports = {
       gamedata.firstChoice.choice = myChoice;
       isStarted = true;
 
-      await interaction.reply(`${gamedata.firstChoice.user} is waiting...`);
+      await interaction.reply(
+        `${gamedata.firstChoice.user}형이 한 팔을 앞으로 내민채 기다리고 있어!!`
+      );
     } else if (isStarted == true) {
       gamedata.secondChoice.user = user;
       gamedata.secondChoice.choice = myChoice;
@@ -54,18 +51,18 @@ module.exports = {
         weapons[gamedata.firstChoice.choice].weakTo ==
         gamedata.secondChoice.choice
       ) {
-        winner = `Winner is ${gamedata.secondChoice.user}!`;
+        winner = `${gamedata.secondChoice.user}형이 이겼어!`;
       } else if (
         weapons[gamedata.firstChoice.choice].strongTo ==
         gamedata.secondChoice.choice
       ) {
-        winner = `Winner is ${gamedata.firstChoice.user}!`;
-      } else winner = "Nobody wins. DRAW";
+        winner = `${gamedata.firstChoice.user}형이 이겼어!`;
+      } else winner = "둘이 마음이 통했나본데? 비겼어!!";
 
       await interaction.reply(
-        `${gamedata.firstChoice.user} choiced ${
+        `${gamedata.firstChoice.user} chose ${
           chat[gamedata.firstChoice.choice]
-        } \n${gamedata.secondChoice.user} choiced ${
+        } \n${gamedata.secondChoice.user} chose ${
           chat[gamedata.secondChoice.choice]
         }\n${winner}`
       );
